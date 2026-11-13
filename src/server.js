@@ -16,7 +16,6 @@ const manifest = {
   version: "1.0.0",
   name: "MagnetBR Brasil",
   description: "Busca streams em indexadores brasileiros via MagnetBR.",
-  logo: "https://raw.githubusercontent.com/mykaelandradee/magnetbr-addon/main/assets/logo.png",
   resources: ["catalog", "stream"],
   types: ["movie", "series"],
   idPrefixes: ["tt"],
@@ -126,8 +125,9 @@ function titleForResult(item) {
   return { title, year };
 }
 
-app.get("/", (_req, res) => {
-  res.type("html").send(`<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>MagnetBR Brasil</title><style>body{font:16px system-ui;max-width:760px;margin:8vh auto;padding:24px;background:#101318;color:#edf1f7}a{color:#8bd5ff}.muted{color:#aab4c3}code{background:#202733;padding:3px 7px;border-radius:6px}</style><h1>MagnetBR Brasil</h1><p>Addon de busca para Stremio e Nuvio.</p><p><a href="/manifest.json">Instalar / abrir manifest</a></p><p class="muted">Para adicionar: use a URL <code>${BASE_URL === "https://magnetbr.flixbr.online" ? "URL_DO_SEU_RENDER" : ""}/manifest.json</code> do serviço publicado.</p><p class="muted">A disponibilidade dos resultados depende do serviço MagnetBR e dos indexadores configurados.</p></html>`);
+app.get("/", (req, res) => {
+  const installUrl = `${req.protocol}://${req.get("host")}/manifest.json`;
+  res.type("html").send(`<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>MagnetBR Brasil</title><style>body{font:16px system-ui;max-width:760px;margin:8vh auto;padding:24px;background:#101318;color:#edf1f7}a{color:#8bd5ff}.muted{color:#aab4c3}code{background:#202733;padding:3px 7px;border-radius:6px}</style><h1>MagnetBR Brasil</h1><p>Addon de busca para Stremio e Nuvio.</p><p><a href="/manifest.json">Abrir manifest</a></p><p>URL para instalar: <code>${installUrl}</code></p><p class="muted">A disponibilidade dos resultados depende do serviço MagnetBR e dos indexadores configurados.</p></html>`);
 });
 
 app.get("/health", (_req, res) => res.json({ status: "ok", service: "magnetbr-addon" }));
