@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: magnetbr-addon
+    runtime: node
+    plan: free
+    region: ohio
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MAGNETBR_BASE_URL
+        value: https://magnetbr.flixbr.online
+      - key: SCRAPER_TYPES
+        value: db,hybrid,all,starck,rede,tfilme,comand,bludv,torrentclaw
+      - key: REQUEST_TIMEOUT_MS
+        value: "12000"
+      - key: CACHE_TTL_SECONDS
+        value: "300"
