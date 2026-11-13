@@ -126,10 +126,10 @@ function titleForResult(item) {
 }
 
 app.get("/", (req, res) => {
-  const installUrl = \`\${req.protocol}://\${req.get("host")}/manifest.json\`;
+  const installUrl = `${req.protocol}://${req.get("host")}/manifest.json`;
   const safeUrl = installUrl.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
-  const stremioUrl = \`stremio://\${req.get("host")}/manifest.json\`;
-  res.type("html").send(\`<!doctype html>
+  const stremioUrl = `stremio://${req.get("host")}/manifest.json`;
+  res.type("html").send(`<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -160,8 +160,8 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin
 <header class="top"><a class="brand" href="/"><span class="mark">M</span><span>MAGNETBR <span style="color:var(--cyan)">BRASIL</span></span></a><span class="status"><span class="dot" style="display:inline-block;margin-right:6px"></span> Serviço online</span></header>
 <section class="hero"><div class="eyebrow"><span class="dot"></span> Busca brasileira de streams</div><h1>Seu conteúdo.<br><span>Em um só lugar.</span></h1><p class="intro">Encontre opções de filmes e séries usando os indexadores brasileiros do MagnetBR, direto no seu agregador favorito.</p></section>
 <section class="panel"><div class="panel-head"><h2>Adicionar o MagnetBR</h2><span class="version">ADDON v1.0.0</span></div>
-<div class="actions"><a class="btn primary" href="\${stremioUrl}"><span aria-hidden="true">＋</span> Instalar no Stremio</a><button class="btn secondary" type="button" id="open-manifest">Visualizar manifest <span aria-hidden="true">↗</span></button></div>
-<label class="url-label" for="addon-url">URL de instalação · Stremio / Nuvio</label><div class="url-row"><code class="url" id="addon-url">\${safeUrl}</code><button class="copy" type="button" id="copy-url">Copiar URL</button></div>
+<div class="actions"><a class="btn primary" href="${stremioUrl}"><span aria-hidden="true">＋</span> Instalar no Stremio</a><button class="btn secondary" type="button" id="open-manifest">Visualizar manifest <span aria-hidden="true">↗</span></button></div>
+<label class="url-label" for="addon-url">URL de instalação · Stremio / Nuvio</label><div class="url-row"><code class="url" id="addon-url">${safeUrl}</code><button class="copy" type="button" id="copy-url">Copiar URL</button></div>
 <p class="hint">No Nuvio, copie a URL acima e adicione-a pela opção de instalação de addons por URL.</p><div id="notice" role="status" aria-live="polite"></div></section>
 <section class="steps" aria-label="Como instalar"><article class="step"><span class="num">01</span><div><strong>Copie o endereço</strong><p>Use o botão para copiar a URL do manifesto.</p></div></article><article class="step"><span class="num">02</span><div><strong>Adicione ao app</strong><p>Cole o endereço na área de instalação de addons do Nuvio.</p></div></article><article class="step"><span class="num">03</span><div><strong>Pesquise e aproveite</strong><p>Busque filmes e séries para encontrar resultados disponíveis.</p></div></article></section>
 <footer><span>MagnetBR Brasil · Addon comunitário</span><a href="/health">Status do serviço</a><a href="/manifest.json">Manifesto técnico</a></footer>
@@ -169,7 +169,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin
 const url=document.getElementById("addon-url").textContent;const notice=document.getElementById("notice");
 document.getElementById("copy-url").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(url);notice.textContent="URL copiada para a área de transferência."}catch{notice.textContent="Não foi possível copiar automaticamente. Selecione e copie a URL acima."}});
 document.getElementById("open-manifest").addEventListener("click",()=>window.open("/manifest.json","_blank","noopener"));
-</script></body></html>\`);
+</script></body></html>`);
 });
 
 app.get("/health", (_req, res) => res.json({ status: "ok", service: "magnetbr-addon" }));
