@@ -1,0 +1,10 @@
+{
+  "name": "magnetbr-nuvio-addon",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Addon de busca MagnetBR para Stremio e Nuvio",
+  "engines": { "node": ">=20" },
+  "scripts": { "start": "node src/server.js", "check": "node --check src/server.js" },
+  "dependencies": { "express": "^4.21.2" }
+}
