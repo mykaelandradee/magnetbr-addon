@@ -5,7 +5,7 @@ app.disable("x-powered-by");
 
 const PORT = Number(process.env.PORT || 7000);
 const BASE_URL = (process.env.MAGNETBR_BASE_URL || "https://magnetbr.flixbr.online").replace(/\/$/, "");
-const SCRAPER_TYPES = (process.env.SCRAPER_TYPES || "db,hybrid,all,starck,rede,tfilme,comand,bludv,torrentclaw")
+const SCRAPER_TYPES = (process.env.SCRAPER_TYPES || "all")
   .split(",").map(v => v.trim()).filter(Boolean);
 const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 12000);
 const CACHE_TTL_SECONDS = Number(process.env.CACHE_TTL_SECONDS || 300);
