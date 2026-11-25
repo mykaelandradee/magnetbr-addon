@@ -1,15 +1,38 @@
 import express from "express";
 
 const app = express();
+app.set("trust proxy", 1);
 app.disable("x-powered-by");
 
 const PORT = Number(process.env.PORT || 7000);
 const BASE_URL = (process.env.MAGNETBR_BASE_URL || "https://magnetbr.flixbr.online").replace(/\/$/, "");
 const SCRAPER_TYPES = (process.env.SCRAPER_TYPES || "all")
   .split(",").map(v => v.trim()).filter(Boolean);
-const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 12000);
+const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 8000);
 const CACHE_TTL_SECONDS = Number(process.env.CACHE_TTL_SECONDS || 300);
 const cache = new Map();
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 30;
+const requestBuckets = new Map();
+
+function protectSearch(req, res, next) {
+  const now = Date.now();
+  const ip = String(req.ip || req.socket?.remoteAddress || "unknown").slice(0, 100);
+  let bucket = requestBuckets.get(ip);
+  if (!bucket || bucket.resetAt <= now) {
+    bucket = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+    requestBuckets.set(ip, bucket);
+  }
+  bucket.count += 1;
+  if (bucket.count > RATE_LIMIT_MAX) {
+    res.set("Cache-Control", "no-store");
+    return res.status(429).json({ error: "Limite temporário de pesquisas atingido. Aguarde um minuto e tente novamente." });
+  }
+  if (requestBuckets.size > 1000) {
+    for (const [key, value] of requestBuckets) if (value.resetAt <= now) requestBuckets.delete(key);
+  }
+  next();
+}
 
 const manifest = {
   id: "com.mykael.magnetbr",
@@ -175,7 +198,8 @@ document.getElementById("open-manifest").addEventListener("click",()=>window.ope
 app.get("/health", (_req, res) => res.json({ status: "ok", service: "magnetbr-addon" }));
 app.get("/manifest.json", (_req, res) => res.json(manifest));
 
-app.get("/catalog/:type/:id.json", async (req, res) => {
+app.get("/catalog/:type/:id.json", protectSearch, async (req, res) => {
+  res.set("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=600");
   const type = req.params.type === "series" ? "series" : "movie";
   const query = clean(req.query.search);
   if (!query) return res.json({ metas: [] });
@@ -200,7 +224,8 @@ app.get("/catalog/:type/:id.json", async (req, res) => {
   }
 });
 
-app.get("/stream/:type/:id.json", async (req, res) => {
+app.get("/stream/:type/:id.json", protectSearch, async (req, res) => {
+  res.set("Cache-Control", "public, max-age=30, s-maxage=180, stale-while-revalidate=300");
   const type = req.params.type === "series" ? "series" : "movie";
   const id = clean(req.params.id).match(/tt\d+/)?.[0];
   if (!id) return res.json({ streams: [] });
@@ -227,4 +252,7 @@ app.get("/stream/:type/:id.json", async (req, res) => {
   }
 });
 
-app.listen(PORT, "0.0.0.0", () => console.log(`MagnetBR addon ativo na porta ${PORT}`));
+export default app;
+if (process.env.VERCEL !== "1") {
+  app.listen(PORT, "0.0.0.0", () => console.log(`MagnetBR addon ativo na porta ${PORT}`));
+}
