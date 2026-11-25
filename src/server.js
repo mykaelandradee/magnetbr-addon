@@ -39,6 +39,7 @@ const manifest = {
   version: "1.0.0",
   name: "MagnetBR Brasil",
   description: "Busca streams em indexadores brasileiros via MagnetBR.",
+  icon: "https://magnetbr-addon.vercel.app/icon.svg",
   resources: ["catalog", "stream"],
   types: ["movie", "series"],
   idPrefixes: ["tt"],
